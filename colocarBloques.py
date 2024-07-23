@@ -1,5 +1,3 @@
-from geodesica import geodesic_dome
-from math import sqrt
 from icosaedro import *
 import os
 
@@ -17,39 +15,6 @@ def listaComandos(listaCoordenadas:list ,bloque:str):
     return lista
 
 
-def llistaComandos():
-    radius = 30  # Adjust as needed
-    frequency = 3  # Adjust as needed
-    center = (0, 0, 0)  # Default center, adjust as needed
-    edge_width = 1  # Adjust edge width here
-    include_faces = True  # Include faces by default
-    only_dome = True  # Only dome by default
-
-    vertex_blocks, edge_blocks, face_blocks = geodesic_dome(radius, frequency, center, edge_width, include_faces, only_dome)
-
-    vertex_blocks = list(vertex_blocks)
-    edge_blocks = list(edge_blocks)
-    face_blocks = list(face_blocks)
-
-    numVertex = len(vertex_blocks)
-    numEdge = len(edge_blocks)
-    numFace = len(face_blocks)
-
-    llista = list()
-
-    #for i in range(numFace):
-    #    comando = colocarBloque(face_blocks[i], "glass")
-    #    llista.append(comando)
-    #for i in range(numEdge):
-    #    comando = colocarBloque(edge_blocks[i], "gold_block")
-    #    llista.append(comando)
-    #for i in range(numVertex):
-    #    comando = colocarBloque(vertex_blocks[i], "diamond_block")
-    #    llista.append(comando)
-
-    print("Mida llista: ", len(llista))
-    return(llista)
-
 def escribir_en_archivo(nombre_archivo, llistaComandos):
     c=0
     t = 0
@@ -65,31 +30,19 @@ def escribir_en_archivo(nombre_archivo, llistaComandos):
         print(f"Las líneas se han guardado en {str(c) + nombre_archivo}")
         c = c+1
 
-def generarCarasIcosaedro(r):
-    bloquesCaras = []
-    for triangulo in triangulosIcosaedro(r):
-        bloquesCaras = bloquesCaras + llenarTriangulo(triangulo)
-    return bloquesCaras
 
-def generarCaras(r):
-    bloquesCaras = []
-
-    lista = triangulosIcosaedro(r)
-    lista = aumentarTriangulos(lista, r)
-
-    for triangulo in lista:
-        bloquesCaras = bloquesCaras + llenarTriangulo(triangulo)
-    return bloquesCaras
 
 def main():
 
-    radio = 200
+    radio = 60
     grosorCaras = 0
     grosorAristas = 1
-    grosorEsquinas = 2
-    densidadTriangulos = 2
+    grosorEsquinas = 3
+    densidadTriangulos = 3
     
-    
+    generarCaras = False
+    generarAristas = True
+    generarEsquinas = True
     
     info = True
 
@@ -125,55 +78,61 @@ def main():
 
     print("Generando icosaedro...")
     conjuntoTriangulos = triangulosIcosaedro(radio)
-    #print(conjuntoTriangulos)
+
     print("Generando triangulos intermedios...")
     conjuntoTriangulos = aumentarMuchosTriangulos(conjuntoTriangulos, radio, densidadTriangulos)
-    #print("Triangulos: ", conjuntoTriangulos)
-    print("Generando las aristas...")
-    conjuntoAristas = aristasDeTriangulos(conjuntoTriangulos)
-    #print("Aristas: ", conjuntoAristas)
-    print("Generando las esquinas")
-    conjuntoEsquinas = esquinasDeTriangulos(conjuntoTriangulos)
-    print("Adaptando coordenadas de esquinas")
-    conjuntoEsquinas = redondearPuntosConjunto(conjuntoEsquinas, 0)
-    print("Ensanchando las esquinas")
-    conjuntoEsquinas = agrandarBordes(conjuntoEsquinas, grosorEsquinas, info)
-    print("Adaptando coordenadas de esquinas")
-    conjuntoEsquinas = redondearPuntosConjunto(conjuntoEsquinas, 0)
 
-    print("Rellenando las caras")
-    conjuntoTriangulos = llenarConjuntoTriangulos(conjuntoTriangulos)
-    print("Adaptando las coordenadas de las caras")
-    conjuntoTriangulos = redondearPuntosConjunto(conjuntoTriangulos,0)
-    print("Ensanchando las caras")
-    conjuntoTriangulos = agrandarBordes(conjuntoTriangulos,grosorCaras, info)
-    print("Volviendo a adaptar las coordenadas de las caras")
-    conjuntoTriangulos = redondearPuntosConjunto(conjuntoTriangulos,0)
-    #print("Triangulos: ", conjuntoTriangulos)
-    print("Rellenando las aristas")
-    conjuntoAristas = llenarConjuntoAristas(conjuntoAristas)
-    print("Adaptando las coordenadas de las aristas")
-    conjuntoAristas = redondearPuntosConjunto(conjuntoAristas,0)
-    print("Ensanchando las aristas")
-    conjuntoAristas = agrandarBordes(conjuntoAristas, grosorAristas, info)
-    print("Volviendo a adaptar las coordenadas de las aristas")
-    conjuntoAristas = redondearPuntosConjunto(conjuntoAristas,0)
-    #print("Aristas: ", conjuntoAristas)
+    if generarEsquinas:
+        print("Generando las esquinas")
+        conjuntoEsquinas = esquinasDeTriangulos(conjuntoTriangulos)
+        print("Adaptando coordenadas de esquinas")
+        conjuntoEsquinas = redondearPuntosConjunto(conjuntoEsquinas, 0)
+        print("Ensanchando las esquinas")
+        conjuntoEsquinas = agrandarBordes(conjuntoEsquinas, grosorEsquinas, info)
+        print("Redaptando coordenadas de esquinas")
+        conjuntoEsquinas = redondearPuntosConjunto(conjuntoEsquinas, 0)
 
-    print("funcion creada para colocar bloques")
-    com = listaComandos(conjuntoTriangulos, "glass")
-    print("   Cara: ", len(com))
-    escribir_en_archivo("caras.mcfunction", com)
-    #print(conjuntoTriangulos)
-    com = listaComandos(conjuntoAristas, "quartz_block")
-    escribir_en_archivo("aristas.mcfunction", com)
-    print("   Arista: ", len(com))
-    #print(conjuntoAristas)
-    com = listaComandos(conjuntoEsquinas, "diamond_block")
-    escribir_en_archivo("esquinas.mcfunction", com)
-    print("   Esquina: ", len(com))
-    #com = listaComandos(redondearPuntosConjunto(crearEsfera((0,0,0),1),0), "diamond_block")
-    #escribir_en_archivo("bola.mcfunction", com)
+    if generarAristas:
+        print("Generando las aristas...")
+        conjuntoAristas = aristasDeTriangulos(conjuntoTriangulos)
+        print("Rellenando las aristas")
+        conjuntoAristas = llenarConjuntoAristas(conjuntoAristas)
+        print("Adaptando las coordenadas de las aristas")
+        conjuntoAristas = redondearPuntosConjunto(conjuntoAristas,0)
+        print("Ensanchando las aristas")
+        conjuntoAristas = agrandarBordes(conjuntoAristas, grosorAristas, info)
+        print("Volviendo a adaptar las coordenadas de las aristas")
+        conjuntoAristas = redondearPuntosConjunto(conjuntoAristas,0)
+
+    if generarCaras:
+        print("Rellenando las caras")
+        conjuntoTriangulos = llenarConjuntoTriangulos(conjuntoTriangulos)
+        print("Adaptando las coordenadas de las caras")
+        conjuntoTriangulos = redondearPuntosConjunto(conjuntoTriangulos,0)
+        print("Ensanchando las caras")
+        conjuntoTriangulos = agrandarBordes(conjuntoTriangulos,grosorCaras, info)
+        print("Readaptando las coordenadas de las caras")
+        conjuntoTriangulos = redondearPuntosConjunto(conjuntoTriangulos,0)
+
+
+    if generarCaras:
+        print("Creando comandos para generar las caras...")
+        com = listaComandos(conjuntoTriangulos, "glass")
+        print("   Las caras constan de ", len(com), " bloques")
+        escribir_en_archivo("caras.mcfunction", com)
+    
+    if generarAristas:
+        print("Creando comandos para generar las aristas...")
+        com = listaComandos(conjuntoAristas, "quartz_block")
+        escribir_en_archivo("aristas.mcfunction", com)
+        print("   Las aristas constan de ", len(com), " bloques")
+    
+    if generarEsquinas:
+        print("Creando comandos para generar las esquinas...")
+        com = listaComandos(conjuntoEsquinas, "diamond_block")
+        escribir_en_archivo("esquinas.mcfunction", com)
+        print("   Las esquinas constan de ", len(com), " bloques")
+
     
 if __name__ == "__main__":
     main()

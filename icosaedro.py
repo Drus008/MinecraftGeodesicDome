@@ -1,8 +1,5 @@
 import numpy as np
 from math import sqrt, cos, sin, pi
-import math
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 PHI = (1+sqrt(5))/2
 
@@ -10,7 +7,7 @@ PHI = (1+sqrt(5))/2
 # Puntos: son 3-tuplas
 # Aristas: frozenSets con 2 puntos
 # Triangulos: frozenSets con 3 puntos
-# Conjuntos de puntos: conjuntos que sus elementos son puntos
+# Conjuntos de puntos: conjuntos que sus elementos son puntosr
 
 def triangulosIcosaedro(r):
     esquinas = np.array(esquinasIcosaedro(r))
@@ -96,7 +93,10 @@ def agrandarBordes(conjuntoPuntos, g, ix:bool = False):
         nuevoConjunto = nuevoConjunto.union(crearEsfera(P,g))
         if ix:
             if c%10==0:
-                print(c, "/",tamaño)
+                if c<1000:
+                    print(c, "/",tamaño)
+                elif c%100==0:
+                    print(c, "/",tamaño)
             c=c+1
     if ix:print()
     return nuevoConjunto
@@ -222,7 +222,3 @@ def llenarConjuntoTriangulos(conjuntoTriangulos):
             print(str(c) + "/" + str(tamño))
         c= c+1
     return conjuntoPuntos
-
-
-
-
