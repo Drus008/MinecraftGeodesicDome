@@ -1,4 +1,4 @@
-from icosaedro import *
+from icosaedroDiscreto import *
 import os
 
 # Posibles expansiones:
@@ -10,7 +10,7 @@ carpeta = "C:/Users/druss/AppData/Roaming/.minecraft/saves/Pruebas DataPack/data
 version = "1.21"
 
 
-PHI = (1+sqrt(5))/2
+
 
 # Genera el comando que coloca el "bloque" en las coordenadas "coordenadas"
 def comandoColocarBloque(coordenadas, bloque:str):
@@ -57,11 +57,12 @@ def escribir_en_archivo(nombre_archivo, llistaComandos):
 
 
 def main():
-    radio = 10
-    grosorCaras = 1
+    radio = 30
+    # Importante! en el radio no se cuenta el grosor de las paredes!
+    grosorCaras = 0
     grosorAristas = 1
-    grosorEsquinas = 1
-    densidadTriangulos = 0
+    grosorEsquinas = 2
+    densidadTriangulos = 1
     
     generarCaras = True
     generarAristas = True
@@ -113,34 +114,22 @@ def main():
     if generarEsquinas:
         print("Generando las esquinas")
         conjuntoEsquinas = esquinasDeTriangulos(conjuntoTriangulos)
-        print("Adaptando coordenadas de esquinas")
-        conjuntoEsquinas = redondearPuntosConjunto(conjuntoEsquinas, 0)
         print("Ensanchando las esquinas")
         conjuntoEsquinas = agrandarBordes(conjuntoEsquinas, grosorEsquinas, info)
-        print("Redaptando coordenadas de esquinas")
-        conjuntoEsquinas = redondearPuntosConjunto(conjuntoEsquinas, 0)
 
     if generarAristas:
         print("Generando las aristas...")
         conjuntoAristas = aristasDeTriangulos(conjuntoTriangulos)
         print("Rellenando las aristas")
         conjuntoAristas = llenarConjuntoAristas(conjuntoAristas)
-        print("Adaptando las coordenadas de las aristas")
-        conjuntoAristas = redondearPuntosConjunto(conjuntoAristas,0)
         print("Ensanchando las aristas")
         conjuntoAristas = agrandarBordes(conjuntoAristas, grosorAristas, info)
-        print("Volviendo a adaptar las coordenadas de las aristas")
-        conjuntoAristas = redondearPuntosConjunto(conjuntoAristas,0)
 
     if generarCaras:
         print("Rellenando las caras")
         conjuntoTriangulos = llenarConjuntoTriangulos(conjuntoTriangulos)
-        print("Adaptando las coordenadas de las caras")
-        conjuntoTriangulos = redondearPuntosConjunto(conjuntoTriangulos,0)
         print("Ensanchando las caras")
         conjuntoTriangulos = agrandarBordes(conjuntoTriangulos,grosorCaras, info)
-        print("Readaptando las coordenadas de las caras")
-        conjuntoTriangulos = redondearPuntosConjunto(conjuntoTriangulos,0)
 
     print(len(conjuntoTriangulos), len(conjuntoAristas), len(conjuntoEsquinas))
 
@@ -162,6 +151,8 @@ def main():
         escribir_en_archivo("esquinas.mcfunction", com)
         print("   Las esquinas constan de ", len(com), " bloques")
 
-
+import time
+t = time.time()
 if __name__ == "__main__":
     main()
+print(time.time()-t)
