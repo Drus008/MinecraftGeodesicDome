@@ -5,6 +5,13 @@ from math import sqrt, cos, sin, pi
 PHI = (1+sqrt(5))/2
 
 
+class punto(tuple):
+    def __new__(self, coordenadas):
+        nuevasCoords = []
+        for i in coordenadas:
+            nuevasCoords.append(round(i))
+        return super(punto, self).__new__(self, tuple(nuevasCoords))
+
 # Clases de objetos:
 # Puntos: son 3-tuplas ¿de enteros?
 # Aristas: frozenSets con 2 puntos
