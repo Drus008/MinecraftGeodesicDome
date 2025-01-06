@@ -1,14 +1,14 @@
-from icosaedroDiscreto import *
+from icosaedro import *
 import os
 
 # Posibles expansiones:
 # Usar otras figuras para las caras
 # Usar otros sólidos platónicos
+# Implementar multinúcleo
 
 
-carpeta = "C:/Users/druss/AppData/Roaming/.minecraft/saves/Pruebas DataPack/datapacks/geodesic_dome/data/dome/function/"
+root = "C:/Users/druss/AppData/Roaming/.minecraft/saves/Pruebas DataPack/datapacks/geodesic_dome/data/dome/function/"
 version = "1.21"
-
 
 
 
@@ -37,12 +37,48 @@ def listaComandos(listaCoordenadas: set ,bloque:str):
         lista.append(comandoColocarBloque(cord, bloque))
     return lista
 
+def comandoFinal(ns:list[int], dir):
+
+    partes = dir.split('/')
+    direccion =partes[-6]+'/'+partes[-5]+'/'+partes[-4]+'/'+partes[-3]+'/'+partes[-2]+"/"
+
+    comandoGeneral = '$function dome:'+direccion
+    with open(dir+ "domo.mcfunction", 'a') as archivo:
+        for i in range(ns[2]):
+            comando = comandoGeneral + "caras"+str(i) + ' {cara:"$(cara)"}'
+            archivo.write(comando + "\n")
+        for i in range(ns[1]):
+            comando = comandoGeneral + "aristas"+str(i) + ' {arista:"$(arista)"}'
+            archivo.write(comando + "\n")
+        for i in range(ns[2]):
+            comando = comandoGeneral + "esquinas"+str(i) + ' {esquina:"$(esquina)"}'
+            archivo.write(comando + "\n")
+
+
+def crearCarpetas(dTri, r, gEs, gAr, gCar):
+    global root
+
+    carpeta = root
+
+    carpeta = carpeta+str(dTri)
+    os.makedirs(carpeta, exist_ok=True)
+    carpeta = carpeta+"/"+str(r)
+    os.makedirs(carpeta, exist_ok=True)
+    carpeta = carpeta+"/"+str(gEs+1)
+    os.makedirs(carpeta, exist_ok=True)
+    carpeta = carpeta+"/"+str(gAr+1)
+    os.makedirs(carpeta, exist_ok=True)
+    carpeta = carpeta+"/"+str(gCar+1)
+    os.makedirs(carpeta, exist_ok=True)
+    carpeta = carpeta + "/"
+    return carpeta
+
 # Dada una lista de comando de minecraft, escrive cada uno en un archivo de un nombre dado
-def escribir_en_archivo(nombre_archivo, llistaComandos):
+def escribir_en_archivo(nombre_archivo, llistaComandos, info=False):
     c=0
     t = 0
     while t<len(llistaComandos):
-        direccion = carpeta + str(c) + nombre_archivo
+        direccion = nombre_archivo + str(c) + ".mcfunction"
         with open(direccion, 'a') as archivo:
             for i in range(65530):
                 if t>=len(llistaComandos):
@@ -50,20 +86,15 @@ def escribir_en_archivo(nombre_archivo, llistaComandos):
                 archivo.write(llistaComandos[i + c*65530] + "\n")
                 t = t+1
         
-        
-        print(f"Las líneas se han guardado en {direccion}")
+        if info:
+            print(f"Las líneas se han guardado en {direccion}")
         c = c+1
+    return c
 
 
-
-def main():
-    radio = 30
+def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorAristas:int, grosorEsquinas:int, info:bool = False):
     # Importante! en el radio no se cuenta el grosor de las paredes!
-    grosorCaras = 0
-    grosorAristas = 1
-    grosorEsquinas = 2
-    densidadTriangulos = 1
-    
+
     generarCaras = True
     generarAristas = True
     generarEsquinas = True
@@ -72,11 +103,17 @@ def main():
     bloqueAristas = "arista"
     bloqueEsquinas = "esquina"
     
-    info = True
 
     if info:
         print("Eliminando archivos anteriores:")
     
+    carpeta = crearCarpetas(densidadTriangulos, radio, grosorEsquinas, grosorAristas, grosorCaras)
+
+    nombre = carpeta + "domo.mcfunction"
+    if os.path.isfile(nombre):
+        os.remove(nombre)
+        if info:
+            print("  Se ha eliminado " + nombre)
 
     for i in range(20):
         nombre = carpeta + str(i) + "aristas.mcfunction"
@@ -103,56 +140,80 @@ def main():
             if info:
                 print("  Se ha eliminado " + nombre)
 
-    print("Generando domo geodésico de radio ", radio)
+    if info:
+        print("Generando domo geodésico de radio ", radio)
 
-    print("Generando icosaedro...")
+    if info:
+        print("Generando icosaedro...")
     conjuntoTriangulos = triangulosIcosaedro(radio)
 
-    print("Generando triangulos intermedios...")
+    if info:
+        print("Generando triangulos intermedios...")
     conjuntoTriangulos = aumentarMuchosTriangulos(conjuntoTriangulos, radio, densidadTriangulos)
 
     if generarEsquinas:
-        print("Generando las esquinas")
+        if info:
+            print("Generando las esquinas")
         conjuntoEsquinas = esquinasDeTriangulos(conjuntoTriangulos)
-        print("Ensanchando las esquinas")
+        if info:
+            print("Ensanchando las esquinas")
         conjuntoEsquinas = agrandarBordes(conjuntoEsquinas, grosorEsquinas, info)
 
     if generarAristas:
-        print("Generando las aristas...")
+        if info:
+            print("Generando las aristas...")
         conjuntoAristas = aristasDeTriangulos(conjuntoTriangulos)
-        print("Rellenando las aristas")
+        if info:
+            print("Rellenando las aristas")
         conjuntoAristas = llenarConjuntoAristas(conjuntoAristas)
-        print("Ensanchando las aristas")
+        if info:
+            print("Ensanchando las aristas")
         conjuntoAristas = agrandarBordes(conjuntoAristas, grosorAristas, info)
 
     if generarCaras:
-        print("Rellenando las caras")
+        if info:
+            print("Rellenando las caras")
         conjuntoTriangulos = llenarConjuntoTriangulos(conjuntoTriangulos)
-        print("Ensanchando las caras")
+        if info:
+            print("Ensanchando las caras")
         conjuntoTriangulos = agrandarBordes(conjuntoTriangulos,grosorCaras, info)
 
-    print(len(conjuntoTriangulos), len(conjuntoAristas), len(conjuntoEsquinas))
+    if info:
+        print(len(conjuntoTriangulos), len(conjuntoAristas), len(conjuntoEsquinas))
 
+    
+    narchivos = [0,0,0]
     if generarCaras:
-        print("Creando comandos para generar las caras...")
+        if info:
+            print("Creando comandos para generar las caras...")
         com = listaComandos(conjuntoTriangulos, bloqueCaras)
-        print("   Las caras constan de ", len(com), " bloques")
-        escribir_en_archivo("caras.mcfunction", com)
+        narchivos[2] = escribir_en_archivo(carpeta + "caras", com)
+        if info:
+            print("   Las caras constan de ", len(com), " bloques")
+        
     
     if generarAristas:
-        print("Creando comandos para generar las aristas...")
+        if info:
+            print("Creando comandos para generar las aristas...")
         com = listaComandos(conjuntoAristas, bloqueAristas)
-        escribir_en_archivo("aristas.mcfunction", com)
-        print("   Las aristas constan de ", len(com), " bloques")
+        narchivos[1] = escribir_en_archivo(carpeta + "aristas", com)
+        if info:
+            print("   Las aristas constan de ", len(com), " bloques")
+        
     
     if generarEsquinas:
-        print("Creando comandos para generar las esquinas...")
+        if info:
+            print("Creando comandos para generar las esquinas...")
         com = listaComandos(conjuntoEsquinas, bloqueEsquinas)
-        escribir_en_archivo("esquinas.mcfunction", com)
-        print("   Las esquinas constan de ", len(com), " bloques")
+        narchivos[0] = escribir_en_archivo(carpeta + "esquinas", com)
+        if info:
+            print("   Las esquinas constan de ", len(com), " bloques")
 
-import time
-t = time.time()
+    if info:
+        print("Creando comando final...")
+    comandoFinal(narchivos,carpeta)
+
+
+
 if __name__ == "__main__":
-    main()
-print(time.time()-t)
+    creacionDomo(1,30,0,1,2,True)

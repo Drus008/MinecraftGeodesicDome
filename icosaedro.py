@@ -235,13 +235,14 @@ def unirConjunto(conjunto: set[frozenset]) -> set:
     return conjuntoFinal
 
 # Dado un conjunto de triangulos retorna un conjunto con todos los puntos del interior de cada triángulo
-def llenarConjuntoTriangulos(conjuntoTriangulos: set[triangulo]) -> set[punto]:
+def llenarConjuntoTriangulos(conjuntoTriangulos: set[triangulo], ix=False) -> set[punto]:
     conjuntoPuntos = set()
     c=0
     tamño = len(conjuntoTriangulos)
     for triangulo in conjuntoTriangulos:
         conjuntoPuntos = conjuntoPuntos.union(llenarTriangulo(triangulo))
-        if c%10==0:
-            print(str(c) + "/" + str(tamño))
+        if ix:
+            if c%10==0:
+                print(str(c) + "/" + str(tamño))
         c= c+1
     return conjuntoPuntos
