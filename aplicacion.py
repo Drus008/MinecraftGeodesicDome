@@ -1,19 +1,16 @@
 import customtkinter as ctk
+from tkinter import filedialog
 from listas import *
 
 # Falta crear:
 # Un seleccionador de carpeta (potser indicar que si no s'ha trobat el datapack s'ha de crear)
-# Un seleccionador de bloc per a cada part
-# Un seleccionador de radi
-# Un seleccionador de densitat de triangles
 # Una advertencia si s'espera que la cúpula no surti gaire bé
 # Unes instruccions d'us
-# Un seleccionador del nom de la comanda
 
 # Ampliacions
-# Un seleccionador de versio
-
-
+# Un seleccionador de versió
+# Un seleccionador de bloc per a cada part
+# Canviar idioma
 
 
 ctk.set_appearance_mode("System")  # Opciones: "System", "Dark", "Light"
@@ -21,7 +18,7 @@ ctk.set_default_color_theme("blue")  # Opciones: "blue", "dark-blue", "green"
 
 app = ctk.CTk()
 app.title("DomeCraft")
-app.geometry("400x200")  # Ancho x Alto
+app.geometry("800x600")  # Ancho x Alto
 
 
 def solo_numeros(texto):
@@ -55,7 +52,22 @@ def limitar3caracter(event):
     if len(texto) >= 3:
         return "break"
 
-vcmd = app.register(solo_numeros)
+def seleccionar_carpeta():
+    carpeta = filedialog.askdirectory(title="Seleccionar una carpeta")  # Abrir el cuadro de diálogo
+    if carpeta:  # Si se seleccionó una carpeta
+        label_resultado.configure(text=f"Carpeta seleccionada: {carpeta}")
+    else:
+        label_resultado.configure(text="No se seleccionó ninguna carpeta.")
+
+# Crear un botón que abrirá el cuadro de diálogo para seleccionar una carpeta
+boton_seleccionar = ctk.CTkButton(app, text="Seleccionar Carpeta", command=seleccionar_carpeta)
+boton_seleccionar.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+
+# Crear un label para mostrar la carpeta seleccionada
+label_resultado = ctk.CTkLabel(app, text="No se ha seleccionado ninguna carpeta.")
+label_resultado.grid(row=0, column=2, padx=10, pady=10, sticky="w")
+
 
 # Función para habilitar/deshabilitar el texto de caras
 def toggleEntryCara():
@@ -102,50 +114,75 @@ checkboxEsquina = ctk.CTkSwitch(
     command=toggleEntryEsquina
 )
 
-checkboxCara.grid(row=0, column=0, padx=10, pady=10, sticky="w")
-checkboxArista.grid(row=1, column=0, padx=10, pady=10, sticky="w")
-checkboxEsquina.grid(row=2, column=0, padx=10, pady=10, sticky="w")
+checkboxCara.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+checkboxArista.grid(row=2, column=0, padx=10, pady=10, sticky="w")
+checkboxEsquina.grid(row=3, column=0, padx=10, pady=10, sticky="w")
 
-checkboxCara.pack(anchor="w")
-checkboxArista.pack(anchor="w")
-checkboxEsquina.pack(anchor="w")
 
-#
+
 
 anuchraTamaño = 23
 entryCaraTamaño = ctk.CTkEntry(app)
 entryCaraTamaño.configure(state="normal", width=anuchraTamaño)
-entryCaraTamaño.grid(row=0, column=1, padx=10, pady=10, sticky="w")
-entryCaraTamaño.configure(validate="key", validatecommand=(vcmd, "%P"))
+entryCaraTamaño.grid(row=1, column=1, padx=10, pady=10, sticky="w")
 entryCaraTamaño.bind("<Key>", limitar1caracter)
 
 entryAristaTamaño = ctk.CTkEntry(app)
 entryAristaTamaño.configure(state="normal", width=anuchraTamaño)
-entryAristaTamaño.grid(row=1, column=1, padx=10, pady=10, sticky="w")
-entryAristaTamaño.configure(validate="key", validatecommand=(vcmd, "%P"))
+entryAristaTamaño.grid(row=2, column=1, padx=10, pady=10, sticky="w")
 entryAristaTamaño.bind("<Key>", limitar1caracter)
 
 entryEsquinaTamaño = ctk.CTkEntry(app)
 entryEsquinaTamaño.configure(state="normal", width=anuchraTamaño)
-entryEsquinaTamaño.grid(row=2, column=1, padx=10, pady=10, sticky="w")
-entryEsquinaTamaño.configure(validate="key", validatecommand=(vcmd, "%P"))
+entryEsquinaTamaño.grid(row=3, column=1, padx=10, pady=10, sticky="w")
 entryEsquinaTamaño.bind("<Key>", limitar1caracter)
 
 
-entryRadio = ctk.CTkEntry(app)
-entryRadio.configure(state="normal", width=40)
-entryRadio.grid(row=3, column=0, padx=10, pady=10, sticky="w")
-entryRadio.configure(validate="key", validatecommand=(vcmd, "%P"))
-entryRadio.bind("<Key>", limitar3caracter)
+barraCara = ctk.CTkProgressBar(app)
+barraCara.set(0)
+barraCara.grid(row=1, column=2, padx=10, pady=10, sticky="w")
 
-entryDensidad = ctk.CTkEntry(app)
+barraArista = ctk.CTkProgressBar(app)
+barraArista.set(0)
+barraArista.grid(row=2, column=2, padx=10, pady=10, sticky="w")
+
+barraEsquina = ctk.CTkProgressBar(app)
+barraEsquina.set(0)
+barraEsquina.grid(row=3, column=2, padx=10, pady=10, sticky="w")
+
+
+
+frameRadio = ctk.CTkFrame(app)
+frameRadio.grid(row=4, column=0, padx=10, pady=10)
+
+textRadio = ctk.CTkLabel(frameRadio,text="Radio")
+textRadio.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+entryRadio = ctk.CTkEntry(frameRadio)
+entryRadio.configure(state="normal", width=40)
+entryRadio.bind("<Key>", limitar3caracter)
+entryRadio.grid(row=1, column=2)
+
+
+frameDensidad = ctk.CTkFrame(app)
+frameDensidad.grid(row=4, column=1, padx=10, pady=10)
+
+textDensidad = ctk.CTkLabel(frameDensidad,text="Frecuencia geodésica")
+textDensidad.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+entryDensidad = ctk.CTkEntry(frameDensidad)
 entryDensidad.configure(state="normal", width=anuchraTamaño)
-entryDensidad.grid(row=3, column=1, padx=10, pady=10, sticky="w")
-entryDensidad.configure(validate="key", validatecommand=(vcmd, "%P"))
+entryDensidad.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 entryDensidad.bind("<Key>", limitar1caracter)
 
+frameFinal = ctk.CTkFrame(app)
+frameFinal.grid(row=4,column=2)
 
+entryNombre = ctk.CTkEntry(frameFinal, placeholder_text="Nombre",)
+entryNombre.grid(row=0,column=0)
 
+botonGenerar = ctk.CTkButton(frameFinal, text="Generar", fg_color="green")
+botonGenerar.grid(row=0, column=1)
 
 # Ejecutar el bucle principal de la aplicación
 app.mainloop()
