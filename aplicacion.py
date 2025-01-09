@@ -1,16 +1,19 @@
 import customtkinter as ctk
+from colocarBloques import creacionDomo
 from tkinter import filedialog
 from listas import *
 
 # Falta crear:
 # Un seleccionador de carpeta (potser indicar que si no s'ha trobat el datapack s'ha de crear)
-# Una advertencia si s'espera que la cúpula no surti gaire bé
-# Unes instruccions d'us
+
+
 
 # Ampliacions
 # Un seleccionador de versió
-# Un seleccionador de bloc per a cada part
+# Un seleccionador per a fixar un bloc per a cada part
 # Canviar idioma
+# Unes instruccions d'us
+# Una advertencia si s'espera que la cúpula no surti gaire bé
 
 
 ctk.set_appearance_mode("System")  # Opciones: "System", "Dark", "Light"
@@ -51,6 +54,24 @@ def limitar3caracter(event):
 
     if len(texto) >= 3:
         return "break"
+
+def comprovacionesFinales():
+    pass
+
+
+def ejecutarPrograma():
+
+    comprovacionesFinales()
+
+    carpeta = "C:/Users/druss/AppData/Roaming/.minecraft/saves/Prueba"
+    d = int(entryDensidad.get())
+    r = int(entryRadio.get())
+    c = int(entryCaraTamaño.get())
+    a = int(entryAristaTamaño.get())
+    e = int(entryEsquinaTamaño.get())
+    nombre = entryNombre.get()
+
+    creacionDomo(d, r, c, a, e, carpeta, nombre, True)
 
 def seleccionar_carpeta():
     carpeta = filedialog.askdirectory(title="Seleccionar una carpeta")  # Abrir el cuadro de diálogo
@@ -181,7 +202,7 @@ frameFinal.grid(row=4,column=2)
 entryNombre = ctk.CTkEntry(frameFinal, placeholder_text="Nombre",)
 entryNombre.grid(row=0,column=0)
 
-botonGenerar = ctk.CTkButton(frameFinal, text="Generar", fg_color="green")
+botonGenerar = ctk.CTkButton(frameFinal, text="Generar", fg_color="green", command=ejecutarPrograma)
 botonGenerar.grid(row=0, column=1)
 
 # Ejecutar el bucle principal de la aplicación

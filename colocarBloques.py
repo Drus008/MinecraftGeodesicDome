@@ -1,16 +1,15 @@
 from icosaedro import *
+import shutil
 import os
+
+maxComandos = 2147483647
 
 # Posibles expansiones:
 # Usar otras figuras para las caras
 # Usar otros sólidos platónicos
 # Implementar multinúcleo
 
-
-root = "C:/Users/druss/AppData/Roaming/.minecraft/saves/Pruebas DataPack/datapacks/geodesic_dome/data/dome/function/"
-version = "1.21"
-
-
+# C:\Users\druss\AppData\Roaming\.minecraft\saves\New World
 
 # Genera el comando que coloca el "bloque" en las coordenadas "coordenadas"
 def comandoColocarBloque(coordenadas, bloque:str):
@@ -37,53 +36,35 @@ def listaComandos(listaCoordenadas: set ,bloque:str):
         lista.append(comandoColocarBloque(cord, bloque))
     return lista
 
-def comandoFinal(ns:list[int], dir):
+def comandoFinal(ns:list[int], carpeta,  nombre):
 
-    partes = dir.split('/')
-    direccion =partes[-6]+'/'+partes[-5]+'/'+partes[-4]+'/'+partes[-3]+'/'+partes[-2]+"/"
 
-    comandoGeneral = '$function dome:'+direccion
-    with open(dir+ "domo.mcfunction", 'a') as archivo:
+    comandoGeneral = '$function '+nombre +":"
+    with open(carpeta+ "domo.mcfunction", 'a') as archivo:
         for i in range(ns[2]):
             comando = comandoGeneral + "caras"+str(i) + ' {cara:"$(cara)"}'
             archivo.write(comando + "\n")
         for i in range(ns[1]):
             comando = comandoGeneral + "aristas"+str(i) + ' {arista:"$(arista)"}'
             archivo.write(comando + "\n")
-        for i in range(ns[2]):
+        for i in range(ns[0]):
             comando = comandoGeneral + "esquinas"+str(i) + ' {esquina:"$(esquina)"}'
             archivo.write(comando + "\n")
 
 
-def crearCarpetas(dTri, r, gEs, gAr, gCar):
-    global root
-
-    carpeta = root
-
-    carpeta = carpeta+str(dTri)
-    os.makedirs(carpeta, exist_ok=True)
-    carpeta = carpeta+"/"+str(r)
-    os.makedirs(carpeta, exist_ok=True)
-    carpeta = carpeta+"/"+str(gEs+1)
-    os.makedirs(carpeta, exist_ok=True)
-    carpeta = carpeta+"/"+str(gAr+1)
-    os.makedirs(carpeta, exist_ok=True)
-    carpeta = carpeta+"/"+str(gCar+1)
-    os.makedirs(carpeta, exist_ok=True)
-    carpeta = carpeta + "/"
-    return carpeta
 
 # Dada una lista de comando de minecraft, escrive cada uno en un archivo de un nombre dado
 def escribir_en_archivo(nombre_archivo, llistaComandos, info=False):
+    lim = 65530
     c=0
     t = 0
     while t<len(llistaComandos):
         direccion = nombre_archivo + str(c) + ".mcfunction"
         with open(direccion, 'a') as archivo:
-            for i in range(65530):
+            for i in range(lim):
                 if t>=len(llistaComandos):
                     break
-                archivo.write(llistaComandos[i + c*65530] + "\n")
+                archivo.write(llistaComandos[i + c*lim] + "\n")
                 t = t+1
         
         if info:
@@ -92,8 +73,37 @@ def escribir_en_archivo(nombre_archivo, llistaComandos, info=False):
     return c
 
 
-def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorAristas:int, grosorEsquinas:int, info:bool = False):
+def checkFiles(carpeta):
+    if os.path.exists(carpeta):
+        return False
+    else:
+        os.makedirs(carpeta)
+        return True
+
+def crearInicio(carpeta: str):
+    carpetaJSON = carpeta + "/minecraft"
+    checkFiles(carpetaJSON)
+    carpetaJSON = carpetaJSON + "/tags"
+    checkFiles(carpetaJSON)
+    carpetaJSON = carpetaJSON + "/function"
+    checkFiles(carpetaJSON)
+    shutil.copy("doc/load.json", carpetaJSON)
+    #shutil.copy(os.path.dirname(os.path.abspath(__file__)) + "/tick.json", carpetaJSON)
+
+    carpeta = carpeta + "/main"
+    checkFiles(carpeta)
+    carpeta = carpeta + "/function"
+    checkFiles(carpeta)
+    shutil.copy("doc/repetir.mcfunction", carpeta)
+    #shutil.copy(os.path.dirname(os.path.abspath(__file__)) + "/iniciar.mcfunction", carpeta)
+
+
+
+def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorAristas:int, grosorEsquinas:int, root:str, titulo:str, info:bool = False):
     # Importante! en el radio no se cuenta el grosor de las paredes!
+
+    titulo = titulo.lower()
+
 
     generarCaras = True
     generarAristas = True
@@ -103,11 +113,23 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
     bloqueAristas = "arista"
     bloqueEsquinas = "esquina"
     
+    carpeta = root + "/datapacks/DomeCraft"
+
+    if checkFiles(carpeta):
+        print("Creando datapack")
+        shutil.copy("doc/pack.mcmeta", carpeta)
+
+    carpeta = carpeta + "/data"
+    checkFiles(carpeta)
+    crearInicio(carpeta)
+    carpeta = carpeta + "/" + titulo
+    checkFiles(carpeta)
+    carpeta = carpeta + "/function"
+    checkFiles(carpeta)
+    carpeta = carpeta + "/"
 
     if info:
         print("Eliminando archivos anteriores:")
-    
-    carpeta = crearCarpetas(densidadTriangulos, radio, grosorEsquinas, grosorAristas, grosorCaras)
 
     nombre = carpeta + "domo.mcfunction"
     if os.path.isfile(nombre):
@@ -181,6 +203,7 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
     if info:
         print(len(conjuntoTriangulos), len(conjuntoAristas), len(conjuntoEsquinas))
 
+    suma = 0
     
     narchivos = [0,0,0]
     if generarCaras:
@@ -190,7 +213,8 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
         narchivos[2] = escribir_en_archivo(carpeta + "caras", com)
         if info:
             print("   Las caras constan de ", len(com), " bloques")
-        
+    
+    suma = suma + len(com)
     
     if generarAristas:
         if info:
@@ -199,7 +223,8 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
         narchivos[1] = escribir_en_archivo(carpeta + "aristas", com)
         if info:
             print("   Las aristas constan de ", len(com), " bloques")
-        
+    
+    suma = suma + len(com)
     
     if generarEsquinas:
         if info:
@@ -209,11 +234,16 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
         if info:
             print("   Las esquinas constan de ", len(com), " bloques")
 
+    suma = suma + len(com)
+
+    if suma>maxComandos-300:
+        print("ERROR: DEMASIADOS BLOQUES, LA CÚPULA NO SE GENERARA CORRECTAMENTE")
+
     if info:
         print("Creando comando final...")
-    comandoFinal(narchivos,carpeta)
+    comandoFinal(narchivos, carpeta, titulo)
 
 
 
 if __name__ == "__main__":
-    creacionDomo(1,30,0,1,2,True)
+    creacionDomo(1,30,0,1,2,"C:/Users/druss/AppData/Roaming/.minecraft/saves/Prueba", "hola", True)

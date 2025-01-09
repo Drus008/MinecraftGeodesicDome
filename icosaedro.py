@@ -73,6 +73,7 @@ def escalarPuntos(radio, lista):
 
 # Dado un punto y un radio retorna un conjunto con todos los puntos del interior de la esfera centrada en ese punto con ese radio
 # (creo que una mejor forma de implementar esto és verificar cada punto (entero) en vez de hacerlo por angulos)
+# Esta función va muy lenta, 100% mejor comprovar cada entero
 def crearEsfera(P:punto, r:float) -> set[punto]:
     conjuntoEsfera = set([P])
     P = np.array(P)
