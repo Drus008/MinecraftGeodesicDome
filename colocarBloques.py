@@ -1,8 +1,14 @@
 from icosaedro import *
+from compilacion import rutaRelativa
 import shutil
 import os
 
 maxComandos = 2147483647
+
+
+# Bugs:
+# Si el programa tiene que colocar demasiados bloques no se ejecuta correctamente y hay que hacerlo comando por comando
+# La forma que se me ha ocurrido para solucionarlo es que cada comando se ejecute en un tic distinto, pero es complicado hacerlo
 
 # Posibles expansiones:
 # Usar otras figuras para las caras
@@ -87,15 +93,8 @@ def crearInicio(carpeta: str):
     checkFiles(carpetaJSON)
     carpetaJSON = carpetaJSON + "/function"
     checkFiles(carpetaJSON)
-    shutil.copy("doc/load.json", carpetaJSON)
-    #shutil.copy(os.path.dirname(os.path.abspath(__file__)) + "/tick.json", carpetaJSON)
+    shutil.copy(rutaRelativa("doc/load.json"), carpetaJSON)
 
-    carpeta = carpeta + "/main"
-    checkFiles(carpeta)
-    carpeta = carpeta + "/function"
-    checkFiles(carpeta)
-    shutil.copy("doc/repetir.mcfunction", carpeta)
-    #shutil.copy(os.path.dirname(os.path.abspath(__file__)) + "/iniciar.mcfunction", carpeta)
 
 
 
@@ -104,10 +103,20 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
 
     titulo = titulo.lower()
 
-
     generarCaras = True
     generarAristas = True
     generarEsquinas = True
+
+    if grosorCaras==0:
+        generarCaras=False
+    if grosorAristas==0:
+        generarAristas=False
+    if grosorEsquinas==0:
+        generarEsquinas=False
+
+    grosorAristas = grosorAristas - 1
+    grosorCaras = grosorCaras - 1 
+    grosorEsquinas = grosorEsquinas - 1
 
     bloqueCaras = "cara"
     bloqueAristas = "arista"
@@ -117,7 +126,7 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
 
     if checkFiles(carpeta):
         print("Creando datapack")
-        shutil.copy("doc/pack.mcmeta", carpeta)
+        shutil.copy(rutaRelativa("doc/pack.mcmeta"), carpeta)
 
     carpeta = carpeta + "/data"
     checkFiles(carpeta)

@@ -3,13 +3,15 @@ from colocarBloques import creacionDomo
 from tkinter import filedialog
 from listas import *
 
-# Falta crear:
-# Un seleccionador de carpeta (potser indicar que si no s'ha trobat el datapack s'ha de crear)
+# Falta fer:
+# Verificar que si fiques 0 de gruix no genera aquella part
+# Una quadro de text per a escriure el que s'ha de fer
 
 
 
 # Ampliacions
 # Un seleccionador de versió
+# Un botó per a eliminar el datapack
 # Un seleccionador per a fixar un bloc per a cada part
 # Canviar idioma
 # Unes instruccions d'us
@@ -56,27 +58,45 @@ def limitar3caracter(event):
         return "break"
 
 def comprovacionesFinales():
-    pass
+    listaErrores = []
+    carpeta = label_resultado.cget("text")
+    if carpeta=="":
+        listaErrores.append("Tienes que poner algún nombre")
+    d = entryDensidad.get()
+    if d=="":
+        listaErrores.append("Tienes introducir alguna densidad")    
+    r = entryRadio.get()
+    c = entryCaraTamaño.get()
+    a = entryAristaTamaño.get()
+    e = entryEsquinaTamaño.get()
+    nombre = entryNombre.get()
+    if nombre=="":
+        listaErrores.append("Tienes que poner algún nombre")
+    return listaErrores
 
 
 def ejecutarPrograma():
 
-    comprovacionesFinales()
+    correcto = comprovacionesFinales()
 
-    carpeta = "C:/Users/druss/AppData/Roaming/.minecraft/saves/Prueba"
-    d = int(entryDensidad.get())
-    r = int(entryRadio.get())
-    c = int(entryCaraTamaño.get())
-    a = int(entryAristaTamaño.get())
-    e = int(entryEsquinaTamaño.get())
-    nombre = entryNombre.get()
+    if len(correcto)==0:
+        carpeta = label_resultado.cget("text")
+        d = int(entryDensidad.get())
+        r = int(entryRadio.get())
+        c = int(entryCaraTamaño.get())
+        a = int(entryAristaTamaño.get())
+        e = int(entryEsquinaTamaño.get())
+        nombre = entryNombre.get()
+    else:
+        for i in correcto:
+            print(i)
 
     creacionDomo(d, r, c, a, e, carpeta, nombre, True)
 
 def seleccionar_carpeta():
     carpeta = filedialog.askdirectory(title="Seleccionar una carpeta")  # Abrir el cuadro de diálogo
     if carpeta:  # Si se seleccionó una carpeta
-        label_resultado.configure(text=f"Carpeta seleccionada: {carpeta}")
+        label_resultado.configure(text=carpeta)
     else:
         label_resultado.configure(text="No se seleccionó ninguna carpeta.")
 
@@ -90,50 +110,11 @@ label_resultado = ctk.CTkLabel(app, text="No se ha seleccionado ninguna carpeta.
 label_resultado.grid(row=0, column=2, padx=10, pady=10, sticky="w")
 
 
-# Función para habilitar/deshabilitar el texto de caras
-def toggleEntryCara():
-    if VarCheckboxCara.get():
-        entryCaraTamaño.configure(state="normal", fg_color="white")
-    else:
-        entryCaraTamaño.configure(state="disabled", fg_color="#dbdbdb")
-
-def toggleEntryArista():
-    if VarCheckboxArista.get():
-        entryAristaTamaño.configure(state="normal", fg_color="white")
-    else:
-        entryAristaTamaño.configure(state="disabled", fg_color="#dbdbdb")
-
-def toggleEntryEsquina():
-    if VarCheckboxEsquina.get():
-        entryEsquinaTamaño.configure(state="normal", fg_color="white")
-    else:
-        entryEsquinaTamaño.configure(state="disabled", fg_color="#dbdbdb")
-
-# Variable para la CheckBox
-VarCheckboxCara = ctk.BooleanVar(value=True)
-VarCheckboxArista = ctk.BooleanVar(value=True)
-VarCheckboxEsquina = ctk.BooleanVar(value=True)
-
-
 # Crear una CheckBox con texto al lado
-checkboxCara = ctk.CTkSwitch(
-    app, 
-    text="Caras",
-    variable=VarCheckboxCara, 
-    command=toggleEntryCara
-)
-checkboxArista = ctk.CTkSwitch(
-    app, 
-    text="Aristas",
-    variable=VarCheckboxArista, 
-    command=toggleEntryArista
-)
-checkboxEsquina = ctk.CTkSwitch(
-    app, 
-    text="Esquinas",
-    variable=VarCheckboxEsquina, 
-    command=toggleEntryEsquina
-)
+checkboxCara = ctk.CTkLabel(app, text="Caras")
+checkboxArista = ctk.CTkLabel(app, text="Aristas")
+checkboxEsquina = ctk.CTkLabel(app, text="Esquina")
+
 
 checkboxCara.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 checkboxArista.grid(row=2, column=0, padx=10, pady=10, sticky="w")

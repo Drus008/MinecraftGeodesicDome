@@ -1,0 +1,2 @@
+Como compilar el archivo:
+pyinstaller --onefile --add-data "doc:doc" aplicacion.py
