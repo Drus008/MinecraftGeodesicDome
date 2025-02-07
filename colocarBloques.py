@@ -98,7 +98,7 @@ def crearInicio(carpeta: str):
 
 
 
-def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorAristas:int, grosorEsquinas:int, root:str, titulo:str, info:bool = False):
+def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorAristas:int, grosorEsquinas:int, root:str, titulo:str, progreso, info:bool = False):
     # Importante! en el radio no se cuenta el grosor de las paredes!
 
     titulo = titulo.lower()
@@ -188,7 +188,7 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
         conjuntoEsquinas = esquinasDeTriangulos(conjuntoTriangulos)
         if info:
             print("Ensanchando las esquinas")
-        conjuntoEsquinas = agrandarBordes(conjuntoEsquinas, grosorEsquinas, info)
+        conjuntoEsquinas = agrandarBordes(conjuntoEsquinas, grosorEsquinas, progreso, info)
 
     if generarAristas:
         if info:
@@ -199,7 +199,7 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
         conjuntoAristas = llenarConjuntoAristas(conjuntoAristas)
         if info:
             print("Ensanchando las aristas")
-        conjuntoAristas = agrandarBordes(conjuntoAristas, grosorAristas, info)
+        conjuntoAristas = agrandarBordes(conjuntoAristas, grosorAristas, progreso, info)
 
     if generarCaras:
         if info:
@@ -207,13 +207,13 @@ def creacionDomo(densidadTriangulos:int, radio:int, grosorCaras:int, grosorArist
         conjuntoTriangulos = llenarConjuntoTriangulos(conjuntoTriangulos)
         if info:
             print("Ensanchando las caras")
-        conjuntoTriangulos = agrandarBordes(conjuntoTriangulos,grosorCaras, info)
+        conjuntoTriangulos = agrandarBordes(conjuntoTriangulos,grosorCaras, progreso, info)
 
     if info:
         print(len(conjuntoTriangulos), len(conjuntoAristas), len(conjuntoEsquinas))
 
     suma = 0
-    
+    com = []
     narchivos = [0,0,0]
     if generarCaras:
         if info:

@@ -103,9 +103,12 @@ def crearEsfera(P:punto, r:float) -> set[punto]:
     return conjuntoEsfera
 
 # Dado un conjunto de puntos retorna el conjunto de puntos que están a distancia menor que g de algun punto del conjunto
-def agrandarBordes(conjuntoPuntos: set[punto], g: int, ix:bool = False) -> set[punto]:
-    
+def agrandarBordes(conjuntoPuntos: set[punto], g: int, progreso = False, ix:bool = False) -> set[punto]:
+    if progreso!=False:
+        progreso(0)
     if g==0:
+        if progreso!=False:
+            progreso(1)
         return conjuntoPuntos
     nuevoConjunto = set()
     if ix:
@@ -124,6 +127,8 @@ def agrandarBordes(conjuntoPuntos: set[punto], g: int, ix:bool = False) -> set[p
                 elif c%100==0:
                     print(c, "/",tamaño)
             c=c+1
+        if progreso!=False and c%100==0:
+            progreso(c/tamaño)
     if ix:print()
     return nuevoConjunto
 
